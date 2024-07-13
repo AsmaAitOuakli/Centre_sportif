@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Profile Page</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='user.css') }}"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <ul class="navbar-list">
+        <li class="navbar-item">
+          <a href="{{ url_for('profile') }}" class="nav-link"
+            ><h3>Update</h3></a
+          >
+        </li>
+        <li class="navbar-item">
+          <form method="POST" action="/delete_profile" class="nav">
+            <button type="submit" class="nav-button"><h3>Delete</h3></button>
+          </form>
+        </li>
+        <li class="navbar-item">
+          <form method="POST" action="/deconnexion" class="nav">
+            <button type="submit" class="nav-button"><h3>Logout</h3></button>
+          </form>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="profile-container">
+      <h1>Bonjour {{ prenom }} {{ nom }}</h1>
+    </div>
+  </body>
+</html>

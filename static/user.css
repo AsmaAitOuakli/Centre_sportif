@@ -1,0 +1,58 @@
+body {
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+/* Style for the navbar */
+.navbar {
+    background-color: black; /* Black background */
+    overflow: hidden;
+  }
+  
+  .navbar-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .navbar-item {
+    display: inline;
+  }
+  
+  .navbar-item a,
+  .navbar-item form .nav-button {
+    display: block;
+    color: white; /* White text */
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+  .navbar-item a:hover,
+  .navbar-item form:hover .nav-button {
+    background-color: #ddd; /* Light background on hover */
+    color: black; /* Black text on hover */
+  }
+  
+  .nav-button {
+    background-color: black; /* Black background */
+    color: white; /* White text */
+    border: none;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+  
+  .nav-button:hover .navbar-item {
+    background-color: #ddd; /* Light background on hover */
+    color: black; /* Black text on hover */
+  }
+  h1{
+    text-align: center;
+  }
+  
+  
+ 
