@@ -5,6 +5,7 @@ from flask import Flask, jsonify, render_template, request, session, redirect, u
 from Utilisateur import Utilisateur
 from flask_mail import Mail, Message
 import re
+from Activites import Activites
 app = Flask(__name__)
  
 # Generate a random secret key
@@ -117,12 +118,16 @@ def inscription():
             # Création de l'objet utilisateur et inscription
             utilisateur = Utilisateur('', '', nom, prenom, email, telephone, adresse,type_utilisateur)
             utilisateur.dateNaissance = dateNaissance_str 
+            nom_util,mdp=utilisateur.s_inscrire()
 
-
-            if utilisateur.s_inscrire():
+            if nom_util:
                 # Envoyer un email de confirmation
                 msg = Message('Votre inscription est réussie', recipients=[email])
-                msg.body = f"Bonjour {prenom} {nom}, votre inscription est réussie."
+                msg.body = f"Bonjour {prenom} {nom}, votre inscription est réussie.\n\n"
+                msg.body += f"Voici vos informations de connexion :\n"
+                msg.body += f"Nom d'utilisateur : {nom_util}\n"
+                msg.body += f"Mot de passe : {mdp}\n\n"
+                msg.body += "Merci de vous connecter avec ces informations."
                 mail.send(msg)
                 flash('Inscription réussie', 'success')
                 return redirect(url_for('user'))  # Redirige vers la route 'user' après inscription réussie
@@ -182,5 +187,18 @@ def delete_profile():
 def deconnexion():
     session.clear() 
     return redirect(url_for('login')) 
+
+@app.route('/activites', methods=['GET'])
+def afficher_activites():
+    # Récupère les activités depuis la base de données
+    activites = Activites.get_activities()
+    if activites is None:
+        flash("Erreur lors de la récupération des activités.", 'error')
+        return redirect(url_for('user'))  # Redirige vers la page d'utilisateur en cas d'erreur
+
+    # Rend le template 'activite.html' en passant les activités récupérées
+    return render_template('Activites.html', activites=activites)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

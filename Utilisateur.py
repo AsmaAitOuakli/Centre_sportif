@@ -111,7 +111,7 @@ class Utilisateur:
                 print("Utilisateur inscrit avec succès.")
                 cursor.close()
                 conn.close()
-                return True
+                return self.nom_utilisateur, self.mot_de_passe
 
             except Exception as e:
                 print(f"Erreur lors de l'inscription : {str(e)}")
