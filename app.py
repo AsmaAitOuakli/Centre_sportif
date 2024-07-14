@@ -6,6 +6,7 @@ from Utilisateur import Utilisateur
 from flask_mail import Mail, Message
 import re
 from Activites import Activites
+from Client import Client
 app = Flask(__name__)
  
 # Generate a random secret key
@@ -199,6 +200,24 @@ def afficher_activites():
     # Rend le template 'activite.html' en passant les activités récupérées
     return render_template('Activites.html', activites=activites)
 
+
+@app.route('/inscription_activite/<string:activite_id>', methods=['POST'])
+def inscription_activite(activite_id):
+    if 'user' not in session:
+        flash('Veuillez vous connecter pour vous inscrire à une activité.', 'error')
+        return redirect(url_for('login'))
+    
+    nom_utilisateur = session['user']['nom_utilisateur']
+    date_actuelle = datetime.now().strftime('%Y-%m-%d')
+
+    client = Client(nom_utilisateur, '', '', '', '', '', '')
+
+    if client.inscrire_a_activite(activite_id, date_actuelle):
+        flash('Inscription à l\'activité réussie.', 'success')
+    else:
+        flash('Une erreur s\'est produite lors de l\'inscription à l\'activité.', 'error')
+
+    return redirect(url_for('afficher_activites'))
 
 if __name__ == '__main__':
     app.run(debug=True)
