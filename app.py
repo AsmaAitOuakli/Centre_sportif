@@ -7,6 +7,7 @@ from flask_mail import Mail, Message
 import re
 from Activites import Activites
 from Client import Client
+from Inscription_Activite import Inscription_Activite
 app = Flask(__name__)
  
 # Generate a random secret key
@@ -151,7 +152,7 @@ def profile():
             )
             cursor = conn.cursor()
             query = """
-                SELECT a.Nom_Activite, a.IMAGE
+                SELECT a.Nom_Activite, a.IMAGE, a.Code_Activite
                 FROM Centre_Sportif.Centre.Activites a
                 JOIN Centre_Sportif.Centre.Inscription_Activite ia ON a.Code_Activite = ia.Code_Activite
                 WHERE ia.ID_UTILISATEUR = %s
@@ -232,6 +233,21 @@ def inscription_activite(activite_id):
     else:
         flash('Une erreur s\'est produite lors de l\'inscription à l\'activité.', 'error')
     return redirect(url_for('afficher_activites'))
+# LA ROUTE POUR ANNULER L'INSCRIPTION A UNE ACTIVITER
+@app.route('/annuler_inscription', methods=['POST'])
+def annuler_inscription():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    nom_utilisateur = session['user']['nom_utilisateur']
+    code_activite = request.form['code_activite']
+    client = Client(nom_utilisateur, "", "", "", "", "", "")
+    inscription = Inscription_Activite(code_activite, client.get_user_id(),'')
+    print(f"Suppression de l'inscription pour l'activité {code_activite} et l'utilisateur {client.get_user_id()}")
+    if inscription.annuler_inscription():
+        print("Inscription annulée avec succès.")
+        return redirect(url_for('profile'))
+    else:
+        return "Erreur lors de l'annulation de l'inscription."
 
 
 if __name__ == '__main__':

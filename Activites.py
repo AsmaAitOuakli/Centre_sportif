@@ -53,3 +53,5 @@ class Activites():
         else:
             print("Connexion à Snowflake non établie.")
             return []
+        
+        
