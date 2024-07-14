@@ -61,7 +61,7 @@ def check_user():
                     'telephone': user_info['telephone'],
                     'adresse': user_info['adresse']
                 }
-                return redirect(url_for('user'))
+                return redirect(url_for('afficher_activites'))
             else:
                 return "Erreur lors de la récupération des informations utilisateur."
         else:
@@ -136,11 +136,57 @@ def inscription():
                 flash('Email existe déjà.', 'error')
                 return render_template('accueil.html')
 
+# @app.route('/profile')
+# def profile():
+#     if 'user' in session:
+#         user_info = session['user']
+#         return render_template('profile.html', **user_info)
+#     else:
+#         return redirect(url_for('login'))
+
 @app.route('/profile')
 def profile():
     if 'user' in session:
         user_info = session['user']
-        return render_template('profile.html', **user_info)
+        nom_utilisateur = user_info['nom_utilisateur']
+        mot_de_passe = user_info.get('mot_de_passe')  # Assurez-vous que ce champ est bien présent dans la session
+        nom = user_info['nom']
+        prenom = user_info['prenom']
+        email = user_info['email']
+        
+        # Instanciez l'objet Client avec les informations nécessaires
+        client = Client(nom_utilisateur, mot_de_passe, nom, prenom, email)
+
+        try:
+            # Récupérez l'ID utilisateur à partir de la méthode de la classe Client
+            id_utilisateur = client.get_user_id()  # Assurez-vous que cette méthode retourne l'ID utilisateur
+            
+            # Connect to Snowflake and retrieve activities the user is signed up for
+            user = "ASAA"
+            password = "Maghreb1234"
+            account = "lsyveyx-vd01067"
+            conn = snowflake.connector.connect(
+                user=user,
+                password=password,
+                account=account
+            )
+
+            cursor = conn.cursor()
+            query = """
+                SELECT a.Nom_Activite
+                FROM Centre_Sportif.Centre.Activites a
+                JOIN Centre_Sportif.Centre.Inscription_Activite ia ON a.Code_Activite = ia.Code_Activite
+                WHERE ia.ID_UTILISATEUR = %s
+            """
+            cursor.execute(query, (id_utilisateur,))
+            activites_inscrites = cursor.fetchall()
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print(f"Erreur lors de la récupération des activités inscrites : {str(e)}")
+            activites_inscrites = []
+
+        return render_template('profile.html', prenom=user_info['prenom'], nom=user_info['nom'], nom_utilisateur=nom_utilisateur, email=user_info['email'], telephone=user_info['telephone'], adresse=user_info['adresse'], activites_inscrites=activites_inscrites)
     else:
         return redirect(url_for('login'))
 
@@ -167,7 +213,7 @@ def update_profile():
             'telephone': telephone,
             'adresse': adresse
         })
-        return redirect(url_for('user'))
+        return redirect(url_for('profil'))
     else:
         return "Error updating profile."
 
@@ -218,6 +264,9 @@ def inscription_activite(activite_id):
         flash('Une erreur s\'est produite lors de l\'inscription à l\'activité.', 'error')
 
     return redirect(url_for('afficher_activites'))
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -7,6 +7,8 @@
     <title>Liste des activités</title>
 </head>
 <body>
+    {% include 'navbar.html' %}
+    <h1>Bonjour {{ prenom }} {{ nom }}</h1>
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for activite in activites %}
         <div class="col">
