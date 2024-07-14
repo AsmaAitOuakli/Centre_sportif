@@ -12,43 +12,43 @@ app = Flask(__name__)
 # Generate a random secret key
 app.secret_key = secrets.token_hex(16) 
 # Configuration for Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # E.g., smtp.gmail.com
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'asmaaitouakli@gmail.com'
 app.config['MAIL_PASSWORD'] = 'otjw frme hfsm acjg'
 app.config['MAIL_DEFAULT_SENDER'] = 'fausse.adresse@gmail.com'
-
 mail = Mail(app)
 
 # Route pour la page de login
 @app.route('/user')
 def user():
     return render_template('user.html')
+
 @app.route('/update')
 def update():
     return render_template('profile.html')
+
 @app.route('/delete')
 def delete():
     return render_template('delete.html')
+
 @app.route('/logout')
+
 @app.route('/')
 def login():
     return render_template('accueil.html')
-
+#La route de connexion
 @app.route('/check_user', methods=['POST'])
 def check_user():
     user = "ASAA"
     password = "Maghreb1234"
     account = "lsyveyx-vd01067"
     conn = Utilisateur.connect_to_snowflake(user, password, account)
-
     if conn:
         nom_utilisateur = request.form['nom_utilisateur']
         mot_de_passe = request.form['mot_de_passe']
-
         utilisateur = Utilisateur(nom_utilisateur, mot_de_passe)
-
         if utilisateur.se_connecter():
             conn.close()
             user_info = utilisateur.get_utilisateur()
@@ -68,12 +68,11 @@ def check_user():
             return "Échec de la connexion."
     else:
         return "Erreur de connexion à la base de données."
-    
+# La route Pour Inscription    
 @app.route('/inscription', methods=['GET', 'POST'])    
 def inscription():
     if request.method == 'GET':
         return render_template('accueil.html')
-
     elif request.method == 'POST':
         nom = request.form['nom']
         prenom = request.form['prenom']
@@ -82,19 +81,14 @@ def inscription():
         adresse = request.form.get('adresse')
         dateNaissance_str = request.form.get('dateNaissance')
         type_utilisateur = request.form.get('type_utilisateur')
-        
         # Convertir la chaîne dateNaissance_str en objet datetime.date
         dateNaissance = datetime.strptime(dateNaissance_str, '%Y-%m-%d').date()
-
-            # Vérifier l'âge de l'utilisateur (au moins 15 ans)
+        # Vérifier l'âge de l'utilisateur (au moins 15 ans)
         today = datetime.now().date()
         age_requis = today.year - 15
-
         if dateNaissance.year > age_requis:
                 flash("Vous devez avoir au moins 15 ans pour vous inscrire.", 'error')
                 return redirect(url_for('inscription'))
-    
-
         # Validation des champs
         if not re.match(r'^[a-zA-Z]{3,}$', nom):
             flash('Le nom doit contenir uniquement des lettres et avoir plus de deux caractères.', 'error')
@@ -114,13 +108,11 @@ def inscription():
         elif not type_utilisateur or type_utilisateur.strip() not in ['client', 'gestionnaire', 'moniteur', 'administrateur', 'prepose']:
             flash("Le type d'utilisateur est invalide.", 'error')
             return render_template('accueil.html')
-        else:
-             
+        else:  
             # Création de l'objet utilisateur et inscription
             utilisateur = Utilisateur('', '', nom, prenom, email, telephone, adresse,type_utilisateur)
             utilisateur.dateNaissance = dateNaissance_str 
             nom_util,mdp=utilisateur.s_inscrire()
-
             if nom_util:
                 # Envoyer un email de confirmation
                 msg = Message('Votre inscription est réussie', recipients=[email])
@@ -135,15 +127,7 @@ def inscription():
             else:
                 flash('Email existe déjà.', 'error')
                 return render_template('accueil.html')
-
-# @app.route('/profile')
-# def profile():
-#     if 'user' in session:
-#         user_info = session['user']
-#         return render_template('profile.html', **user_info)
-#     else:
-#         return redirect(url_for('login'))
-
+# La route de Profil
 @app.route('/profile')
 def profile():
     if 'user' in session:
@@ -153,15 +137,10 @@ def profile():
         nom = user_info['nom']
         prenom = user_info['prenom']
         email = user_info['email']
-        
-        # Instanciez l'objet Client avec les informations nécessaires
-        client = Client(nom_utilisateur, mot_de_passe, nom, prenom, email)
 
+        client = Client(nom_utilisateur, mot_de_passe, nom, prenom, email)
         try:
-            # Récupérez l'ID utilisateur à partir de la méthode de la classe Client
-            id_utilisateur = client.get_user_id()  # Assurez-vous que cette méthode retourne l'ID utilisateur
-            
-            # Connect to Snowflake and retrieve activities the user is signed up for
+            id_utilisateur = client.get_user_id()
             user = "ASAA"
             password = "Maghreb1234"
             account = "lsyveyx-vd01067"
@@ -170,10 +149,9 @@ def profile():
                 password=password,
                 account=account
             )
-
             cursor = conn.cursor()
             query = """
-                SELECT a.Nom_Activite
+                SELECT a.Nom_Activite, a.IMAGE
                 FROM Centre_Sportif.Centre.Activites a
                 JOIN Centre_Sportif.Centre.Inscription_Activite ia ON a.Code_Activite = ia.Code_Activite
                 WHERE ia.ID_UTILISATEUR = %s
@@ -185,16 +163,14 @@ def profile():
         except Exception as e:
             print(f"Erreur lors de la récupération des activités inscrites : {str(e)}")
             activites_inscrites = []
-
         return render_template('profile.html', prenom=user_info['prenom'], nom=user_info['nom'], nom_utilisateur=nom_utilisateur, email=user_info['email'], telephone=user_info['telephone'], adresse=user_info['adresse'], activites_inscrites=activites_inscrites)
     else:
         return redirect(url_for('login'))
-
+# LA ROUTE DE MODIFICATION DE PROFIL
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
     if 'user' not in session:
         return redirect(url_for('login'))
-
     nom_utilisateur = session['user']['nom_utilisateur']
     nom = request.form['nom']
     prenom = request.form['prenom']
@@ -203,7 +179,6 @@ def update_profile():
     adresse = request.form['adresse']
     
     utilisateur = Utilisateur(nom_utilisateur, '', nom, prenom, email, telephone, adresse)
-    
     if utilisateur.updateprofile():
         # Update session data
         session['user'].update({
@@ -216,25 +191,24 @@ def update_profile():
         return redirect(url_for('profil'))
     else:
         return "Error updating profile."
-
+# LA ROUTE DE SUPPRISSION DE PROFIL
 @app.route('/delete_profile', methods=['POST'])
 def delete_profile():
     if 'user' not in session:
         return redirect(url_for('login'))
-
     nom_utilisateur = session['user']['nom_utilisateur']
-    utilisateur = Utilisateur(nom_utilisateur)  # No mot_de_passe needed for deletion
-
+    utilisateur = Utilisateur(nom_utilisateur)
     if utilisateur.delete_utilisateur():
         session.pop('user', None)
         return redirect(url_for('login'))
     else:
         return "Error deleting profile."
+# LA ROUTE DE DECONNEXION    
 @app.route('/deconnexion', methods=['POST'])
 def deconnexion():
     session.clear() 
     return redirect(url_for('login')) 
-
+# LA ROUTE D'AFFICHAGE DES ACTIVITES
 @app.route('/activites', methods=['GET'])
 def afficher_activites():
     # Récupère les activités depuis la base de données
@@ -242,30 +216,22 @@ def afficher_activites():
     if activites is None:
         flash("Erreur lors de la récupération des activités.", 'error')
         return redirect(url_for('user'))  # Redirige vers la page d'utilisateur en cas d'erreur
-
-    # Rend le template 'activite.html' en passant les activités récupérées
     return render_template('Activites.html', activites=activites)
-
-
+# LA ROUTE D'INSCRIPTION A UNE ACTIVITE
 @app.route('/inscription_activite/<string:activite_id>', methods=['POST'])
 def inscription_activite(activite_id):
     if 'user' not in session:
         flash('Veuillez vous connecter pour vous inscrire à une activité.', 'error')
         return redirect(url_for('login'))
-    
     nom_utilisateur = session['user']['nom_utilisateur']
     date_actuelle = datetime.now().strftime('%Y-%m-%d')
 
     client = Client(nom_utilisateur, '', '', '', '', '', '')
-
     if client.inscrire_a_activite(activite_id, date_actuelle):
         flash('Inscription à l\'activité réussie.', 'success')
     else:
         flash('Une erreur s\'est produite lors de l\'inscription à l\'activité.', 'error')
-
     return redirect(url_for('afficher_activites'))
-
-
 
 
 if __name__ == '__main__':
