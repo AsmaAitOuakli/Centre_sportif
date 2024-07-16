@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Horaire de l'activité</title>
+</head>
+
+<body>
+    <h1>Horaire de l'activité</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Heure de début</th>
+                <th>Heure de fin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in horaire %}
+            <tr>
+                <td>{{ item.date_of_activity }}</td>
+                <td>{{ item.start_hour }}</td>
+                <td>{{ item.end_hour }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('afficher_activites') }}">Retour à la liste des activités</a>
+</body>
+
+</html>
