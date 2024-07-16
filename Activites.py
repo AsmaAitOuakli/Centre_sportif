@@ -54,4 +54,29 @@ class Activites():
             print("Connexion à Snowflake non établie.")
             return []
         
-        
+    @classmethod    
+    def horaire_activites(id_activity, cls):
+        user = "ASAA"  
+        password = "Maghreb1234"
+        account = "lsyveyx-vd01067"
+    
+        conn = cls.connect_to_snowflake(user, password, account)
+
+        if conn:
+            try :
+                cursor = conn.cursor()
+                query = """
+                SELECT date_of_activity, start_hour, end_hour
+                FROM centre_sportif.centre.horaire
+                WHERE CODE_ACTIVITE = %s
+            """
+                cursor.execute(query, (id_activity,))
+                result= cursor.fetchone()
+                print (result)
+                cursor.close()
+            except snowflake.connector.errors.Error as e:
+                print(f"Query failed: {e}")
+            finally:
+                conn.close()
+        else:
+             print("Failed to connect to Snowflake")
