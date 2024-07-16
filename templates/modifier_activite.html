@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier Activité</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Modifier Activité</h1>
+        <form method="post" action="{{ url_for('update_activity') }}">
+            <input type="hidden" name="code_activite" value="{{ activite.Code_Activite }}">
+            <div class="form-group">
+                <label for="nom_activite">Nom de l'Activité</label>
+                <input type="text" class="form-control" id="nom_activite" name="nom_activite" value="{{ activite.Nom_Activite }}" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control" id="description" name="description" required>{{ activite.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="prix">Prix</label>
+                <input type="number" class="form-control" id="prix" name="prix" value="{{ activite.prix }}" required>
+            </div>
+            <div class="form-group">
+                <label for="image">URL de l'Image</label>
+                <input type="text" class="form-control" id="image" name="image" value="{{ activite.Image }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Modifier</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -249,6 +249,44 @@ def annuler_inscription():
     else:
         return "Erreur lors de l'annulation de l'inscription."
 
+# la route vers la gestion des activites
+@app.route('/gestion_activites')
+def gestion_activites():
+    activities = Activites.get_activities()
+    return render_template('gestion_activites.html', activities=activities)
+
+# pour afficher le formulaire de modification
+# @app.route('/modifier_activite/<code_activite>', methods=['GET'])
+# def modifier_activite(code_activite):
+#     return render_template('modifier_activite.html', code_activite=code_activite)
+@app.route('/modifier_activite/<code_activite>', methods=['GET'])
+def modifier_activite(code_activite):
+    activite = Activites.get_activity_bycode(code_activite)
+    if activite:
+        return render_template('modifier_activite.html', activite=activite)
+    else:
+        return "Activité non trouvée"  
+
+
+# la route por la modification
+@app.route('/update_activity', methods=['POST'])
+def update_activity():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    # Récupérer les données du formulaire
+    code_activite = request.form['code_activite']
+    nom_activite = request.form['nom_activite']
+    description = request.form['description']
+    prix = request.form['prix']
+    image = request.form['image']
+    
+    activite = Activites(code_activite, nom_activite, description, prix, image)
+    if activite.Update_Activite():
+        return redirect(url_for('gestion_activites'))
+    else:
+        return "Erreur lors de la mise à jour de l'activité."
+
 
 if __name__ == '__main__':
     app.run(debug=True)
