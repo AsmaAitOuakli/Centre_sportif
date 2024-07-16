@@ -256,16 +256,14 @@ def gestion_activites():
     return render_template('gestion_activites.html', activities=activities)
 
 # pour afficher le formulaire de modification
-# @app.route('/modifier_activite/<code_activite>', methods=['GET'])
-# def modifier_activite(code_activite):
-#     return render_template('modifier_activite.html', code_activite=code_activite)
 @app.route('/modifier_activite/<code_activite>', methods=['GET'])
 def modifier_activite(code_activite):
+    #recuperer les information avec le code_activite
     activite = Activites.get_activity_bycode(code_activite)
     if activite:
         return render_template('modifier_activite.html', activite=activite)
     else:
-        return "Activité non trouvée"  
+        return "Activité non trouvee"  
 
 
 # la route por la modification
