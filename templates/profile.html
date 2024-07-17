@@ -19,6 +19,7 @@
     {% include 'navbar.html' %}
 
     <div class="container mt-4">
+<<<<<<< HEAD
       <h1>Bonjour {{ prenom }} {{ nom }}</h1>
       <h2>Activités Inscrites :</h2>
       <ul class="list-unstyled">
@@ -53,6 +54,22 @@
         </li>
         {% endfor %}
       </ul>
+=======
+        <h1>Bonjour {{ prenom }} {{ nom }}</h1>
+        <h2>Activités Inscrites :</h2>
+        <ul>
+            {% for activite in activites_inscrites %}
+                <li>
+                    <h3>{{ activite[0] }}</h3>
+                    <img src="{{ activite[1] }}" alt="Image de {{ activite[0] }}" width="300" height="200">
+                    <form method="POST" action="{{ url_for('annuler_inscription') }}">
+                        <input type="hidden" name="code_activite" value="{{ activite[2] }}">
+                        <button type="submit" class="btn btn-danger">Annuler Inscription</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+>>>>>>> 462731d3dfd893e11a5927d3bd790dabd1541fd7
 
       <h1>Update Profile</h1>
       <form method="POST" action="/update_profile">

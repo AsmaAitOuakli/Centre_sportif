@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Activités</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container mt-4">
+        <h1>Liste des Activités</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Code Activité</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Nom Activité</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Prix</th>
+                    <th scope="col">Operation</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activite in activities %}
+                <tr>
+                    <td>{{ activite.Code_Activite }}</td>
+                    <td><img src="{{ activite.Image }}" alt="Image de {{ activite.Nom_Activite }}" width="100" height="100"></td>
+                    <td>{{ activite.Nom_Activite }}</td>
+                    <td>{{ activite.description }}</td>
+                    <td>{{ activite.prix }}</td>
+                    <td>
+                        <a class="btn btn-primary" href="{{ url_for('modifier_activite', code_activite=activite.Code_Activite) }}">Modifier</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
