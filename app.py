@@ -6,6 +6,7 @@ from Utilisateur import Utilisateur
 from flask_mail import Mail, Message
 import re
 from Activites import Activites
+from Inscription_Activite import Inscription_Activite
 from Client import Client
 app = Flask(__name__)
  
@@ -173,10 +174,10 @@ def profile():
 
             cursor = conn.cursor()
             query = """
-                SELECT a.Nom_Activite
+               SELECT a.Nom_Activite, a.IMAGE, a.Code_Activite ,h.DATE_OF_ACTIVITY,h.START_HOUR,h.END_HOUR
                 FROM Centre_Sportif.Centre.Activites a
-                JOIN Centre_Sportif.Centre.Inscription_Activite ia ON a.Code_Activite = ia.Code_Activite
-                WHERE ia.ID_UTILISATEUR = %s
+                JOIN Centre_Sportif.Centre.Inscription_Activite ia join centre_sportif.centre.horaire h  ON a.Code_Activite = ia.Code_Activite
+                and h.id_horaire=ia.id_horaire WHERE ia.ID_UTILISATEUR = %s
             """
             cursor.execute(query, (id_utilisateur,))
             activites_inscrites = cursor.fetchall()
@@ -213,7 +214,7 @@ def update_profile():
             'telephone': telephone,
             'adresse': adresse
         })
-        return redirect(url_for('profil'))
+        return redirect(url_for('profile'))
     else:
         return "Error updating profile."
 
@@ -247,6 +248,7 @@ def afficher_activites():
     return render_template('Activites.html', activites=activites)
 
 
+
 @app.route('/inscription_activite/<string:activite_id>', methods=['POST'])
 def inscription_activite(activite_id):
     if 'user' not in session:
@@ -255,16 +257,51 @@ def inscription_activite(activite_id):
     
     nom_utilisateur = session['user']['nom_utilisateur']
     date_actuelle = datetime.now().strftime('%Y-%m-%d')
-
+    horaire_id= request.form.get('horaire_id') 
+    # print(f"ggggggggggggggggggggggggggggggggggggggg :{horaire_id}")
     client = Client(nom_utilisateur, '', '', '', '', '', '')
 
-    if client.inscrire_a_activite(activite_id, date_actuelle):
-        flash('Inscription à l\'activité réussie.', 'success')
+    if client.inscrire_a_activite(activite_id, date_actuelle,horaire_id):
+        # Succès de l'inscription, mettre à jour le nombre de places disponibles
+        if Activites.decrementer_nombre_places(activite_id):
+            flash('Inscription à l\'activité réussie.', 'success')
+        else:
+            flash('Une erreur s\'est produite lors de la mise à jour du nombre de places disponibles.', 'error')
     else:
         flash('Une erreur s\'est produite lors de l\'inscription à l\'activité.', 'error')
 
     return redirect(url_for('afficher_activites'))
+# LA ROUTE POUR ANNULER L'INSCRIPTION A UNE ACTIVITER
+@app.route('/annuler_inscription', methods=['POST'])
+def annuler_inscription():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    nom_utilisateur = session['user']['nom_utilisateur']
+    code_activite = request.form['code_activite']
+    id_horaire = request.form['id_horaire']
+    client = Client(nom_utilisateur, "", "", "", "", "", "")
+    inscription = Inscription_Activite(code_activite, client.get_user_id(), id_horaire, '')  # Provide the appropriate date if needed
+    print(f"Suppression de l'inscription pour l'activité {code_activite}, l'utilisateur {client.get_user_id()}, et l'horaire {id_horaire}")
+    if inscription.annuler_inscription():
+        print("Inscription annulée avec succès.")
+        return redirect(url_for('profile'))
+    else:
+        return "Erreur lors de l'annulation de l'inscription."
 
+
+@app.route('/activite/<string:code_activite>', methods=['GET'])
+def afficher_detail_activite(code_activite):
+    # Récupère l'activité spécifique depuis la base de données
+    activite = Activites.get_activity_by_code(code_activite)
+
+    if activite:
+        print(f"Image URL: {activite.Image}")  # Vérifiez l'URL de l'image récupérée
+        horaire=Activites.horaire_activites(code_activite)
+        # Rend le template 'activite_detail.html' en passant l'activité récupérée
+        return render_template('activite_detail.html', activite=activite, horaire=horaire)
+    else:
+        flash("Erreur lors de la récupération de l'activité.", 'error')
+        return redirect(url_for('afficher_activites'))  # Redirige vers la liste des activités en cas d'erreur
 
 
 

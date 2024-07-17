@@ -47,7 +47,7 @@ body {
   }
   
   .nav-button:hover .navbar-item {
-    background-color: #ddd; /* Light background on hover */
+    background-color: #ffffff; /* Light background on hover */
     color: black; /* Black text on hover */
   }
   h1{

@@ -29,7 +29,7 @@ class Client(Utilisateur):
             print("Connexion à Snowflake non établie.")
             return None
 
-    def inscrire_a_activite(self, activite_id, date_inscription):
+    def inscrire_a_activite(self, activite_id, date_inscription,id_horaire):
         user_id = self.get_user_id()
         if user_id is None:
             print("Utilisateur non trouvé.")
@@ -43,11 +43,21 @@ class Client(Utilisateur):
         if conn:
             try:
                 cursor = conn.cursor()
-                query = """
-                INSERT INTO Centre_Sportif.Centre.Inscription_Activite (ID_UTILISATEUR, CODE_ACTIVITE, DATE_INSCRIPTION)
-                VALUES (%s, %s, %s)
+                query_check =  """
+                SELECT COUNT(*) 
+                FROM Centre_Sportif.Centre.Inscription_Activite 
+                WHERE ID_UTILISATEUR = %s AND CODE_ACTIVITE = %s
                 """
-                cursor.execute(query, (user_id, activite_id, date_inscription))
+                cursor.execute(query_check, (user_id, activite_id))
+                count = cursor.fetchone()[0]
+                if count > 0:
+                    print("Utilisateur déjà inscrit à cette activité.")
+                    return False
+                query = """
+                INSERT INTO Centre_Sportif.Centre.Inscription_Activite (ID_UTILISATEUR, CODE_ACTIVITE, DATE_INSCRIPTION,ID_HORAIRE)
+                VALUES (%s, %s, %s,%s)
+                """
+                cursor.execute(query, (user_id, activite_id, date_inscription,id_horaire))
                 conn.commit()
                 cursor.close()
                 conn.close()
@@ -58,3 +68,4 @@ class Client(Utilisateur):
         else:
             print("Connexion à Snowflake non établie.")
             return False
+    

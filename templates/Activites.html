@@ -1,32 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Liste des activités</title>
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     {% include 'navbar.html' %}
     <h1>Bonjour {{ prenom }} {{ nom }}</h1>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for activite in activites %}
-        <div class="col">
-            <div class="card">
-                <img src="{{ activite.Image }}" class="card-img-top" alt="Activité Image">
-                <div class="card-body">
-                    <h5 class="card-title">{{ activite.Nom_Activite }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ activite.prix }} $</h6>
-                    <p class="card-text">{{ activite.description }}</p>
-                    <form action="{{ url_for('inscription_activite', activite_id=activite.Code_Activite) }}" method="post">
-                        <button type="submit" class="btn btn-primary">S'inscrire</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+    <div class="activities-container">
+      {% for activite in activites %}
+      <div class="card-body">
+        <h5 class="card-title">
+          <a
+            href="{{ url_for('afficher_detail_activite', code_activite=activite.Code_Activite) }}"
+            class="badge badge-dark"
+          >
+            {{ activite.Nom_Activite }}
+          </a>
+        </h5>
+      </div>
+      <div class="card">
+        <a
+          href="{{ url_for('afficher_detail_activite', code_activite=activite.Code_Activite) }}"
+          ><img
+            src="{{ activite.Image }}"
+            class="card-img-top"
+            alt="Activité Image"
+            href=""
+          />
+        </a>
+        <!-- <p>{{ activite.Image }}</p>  -->
+      </div>
+      {% endfor %}
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
+  </body>
 </html>

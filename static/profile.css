@@ -1,81 +1,50 @@
-/* profile.css */
-
 body {
-  background-color: black;
-  color: white;
+  background-color: #000;
+  color: #fff;
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
 
-.profile-container {
+.container {
+  margin-top: 50px;
   max-width: 800px;
-  margin: 50px auto;
+  margin: 0 auto;
   padding: 20px;
-  border: 2px solid;
-  background-color: transparent;
+  background-color: #727272;
   border-radius: 10px;
-  box-shadow: 0 0 20px rgb(198, 197, 197);
+  box-shadow: 0 0 20px #c6c5c5;
 }
 
 h1 {
   text-align: center;
+  color: #fff;
 }
 
-form {
+ul.list-unstyled {
+  padding: 0;
+}
+
+li {
+  list-style: none;
   margin-bottom: 20px;
 }
 
-label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-input[type="text"],
-input[type="email"] {
-  width: 95%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-button[type="submit"] {
-  background-color: #333;
-  color: rgb(211, 211, 211);
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 5px;
-  
-}
-
-button[type="submit"]:hover {
-  background-color: #555;
-  padding: 10px 20px;
-  margin: 0 10px;
-  margin-left: 150px
-}
-
-/* .navigation {
+.activity-image-container {
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  justify-content: left;
 }
 
-.nav-link,
-.nav-button {
-  background-color: #333;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  margin: 0 10px;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 5px;
-} */
+.activity-image {
+  max-width: 50%;
+  height: auto;
+  border-radius: 10px;
+}
 
-/* .nav-link:hover,
-.nav-button:hover {
-  background-color: #555;
-} */
+form.d-inline-block {
+  display: inline-block;
+}
+
+button.btn {
+  margin-top: 10px;
+}
