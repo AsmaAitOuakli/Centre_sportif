@@ -154,7 +154,6 @@ def profile():
             cursor = conn.cursor()
             query = """
                SELECT a.Nom_Activite, a.IMAGE, a.Code_Activite ,h.DATE_OF_ACTIVITY,h.START_HOUR,h.END_HOUR
-                SELECT a.Nom_Activite, a.IMAGE, a.Code_Activite
                 FROM Centre_Sportif.Centre.Activites a
                 JOIN Centre_Sportif.Centre.Inscription_Activite ia join centre_sportif.centre.horaire h  ON a.Code_Activite = 
                 ia.Code_Activite
@@ -162,6 +161,7 @@ def profile():
             """
             cursor.execute(query, (id_utilisateur,))
             activites_inscrites = cursor.fetchall()
+            print(f"dddddddddd{activites_inscrites}")
             cursor.close()
             conn.close()
         except Exception as e:
@@ -223,7 +223,7 @@ def afficher_activites():
     return render_template('Activites.html', activites=activites)
 
 
-@app.route('/inscription_activite/<string:activite_id>', methods=['POST'])
+# @app.route('/inscription_activite/<string:activite_id>', methods=['POST'])
 # LA ROUTE D'INSCRIPTION A UNE ACTIVITE
 @app.route('/inscription_activite/<activite_id>', methods=['POST'])
 def inscription_activite(activite_id):
@@ -233,23 +233,21 @@ def inscription_activite(activite_id):
     
     nom_utilisateur = session['user']['nom_utilisateur']
     date_actuelle = datetime.now().strftime('%Y-%m-%d')
-    horaire_id= request.form.get('horaire_id') 
-    # print(f"ggggggggggggggggggggggggggggggggggggggg :{horaire_id}")
+    horaire_id = request.form.get('horaire_id')
+    
     client = Client(nom_utilisateur, '', '', '', '', '', '')
 
-    if client.inscrire_a_activite(activite_id, date_actuelle,horaire_id):
+    if client.inscrire_a_activite(activite_id, date_actuelle, horaire_id):
         # Succès de l'inscription, mettre à jour le nombre de places disponibles
         if Activites.decrementer_nombre_places(activite_id):
             flash('Inscription à l\'activité réussie.', 'success')
         else:
             flash('Une erreur s\'est produite lors de la mise à jour du nombre de places disponibles.', 'error')
-    if client.inscrire_a_activite(activite_id, date_actuelle):
-        flash('Inscription à l\'activité réussie.', 'success')
-        return redirect(url_for('horaire_activity', id_activity=activite_id))
-
+        return redirect(url_for('afficher_activites', id_activity=activite_id))
     else:
         flash('Une erreur s\'est produite lors de l\'inscription à l\'activité.', 'error')
         return redirect(url_for('afficher_activites'))
+
 # LA ROUTE DE L'HORAIRE D'UNE ACTIVITE
 @app.route('/horaires_activites/<string:id_activity>', methods=['GET'])
 def horaire_activity(id_activity):
@@ -260,24 +258,24 @@ def horaire_activity(id_activity):
     nom_utilisateur = session['user']['nom_utilisateur']
     horaire=Activites.horaire_activites(id_activity)
     return render_template('horaires_activites.html', horaire=horaire)
-# LA ROUTE POUR ANNULER L'INSCRIPTION A UNE ACTIVITER
-@app.route('/annuler_inscription', methods=['POST'])
-def annuler_inscription():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    nom_utilisateur = session['user']['nom_utilisateur']
-    code_activite = request.form['code_activite']
-    client = Client(nom_utilisateur, "", "", "", "", "", "")
-    inscription = Inscription_Activite(code_activite, client.get_user_id(),'')
-    print(f"Suppression de l'inscription pour l'activité {code_activite} et l'utilisateur {client.get_user_id()}")
-    if inscription.annuler_inscription():
-        print("Inscription annulée avec succès.")
-        return redirect(url_for('profile'))
-    else:
-        return "Erreur lors de l'annulation de l'inscription."
+# # LA ROUTE POUR ANNULER L'INSCRIPTION A UNE ACTIVITER
+# @app.route('/annuler_inscription', methods=['POST'])
+# def annuler_inscription():
+#     if 'user' not in session:
+#         return redirect(url_for('login'))
+#     nom_utilisateur = session['user']['nom_utilisateur']
+#     code_activite = request.form['code_activite']
+#     client = Client(nom_utilisateur, "", "", "", "", "", "")
+#     inscription = Inscription_Activite(code_activite, client.get_user_id(),'')
+#     print(f"Suppression de l'inscription pour l'activité {code_activite} et l'utilisateur {client.get_user_id()}")
+#     if inscription.annuler_inscription():
+#         print("Inscription annulée avec succès.")
+#         return redirect(url_for('profile'))
+#     else:
+#         return "Erreur lors de l'annulation de l'inscription."
 
 
-    return redirect(url_for('afficher_activites'))
+    # return redirect(url_for('afficher_activites'))
 # LA ROUTE POUR ANNULER L'INSCRIPTION A UNE ACTIVITER
 @app.route('/annuler_inscription', methods=['POST'])
 def annuler_inscription():
@@ -300,15 +298,16 @@ def annuler_inscription():
 def afficher_detail_activite(code_activite):
     # Récupère l'activité spécifique depuis la base de données
     activite = Activites.get_activity_by_code(code_activite)
+    print(f"Code activité: {code_activite}")
 
     if activite:
         print(f"Image URL: {activite.Image}")  # Vérifiez l'URL de l'image récupérée
-        horaire=Activites.horaire_activites(code_activite)
+        horaire = Activites.horaire_activites(code_activite)
         # Rend le template 'activite_detail.html' en passant l'activité récupérée
         return render_template('activite_detail.html', activite=activite, horaire=horaire)
-    else:
-        flash("Erreur lors de la récupération de l'activité.", 'error')
-        return redirect(url_for('afficher_activites'))  # Redirige vers la liste des activités en cas d'erreur
+    # else:
+    #     flash("Erreur lors de la récupération de l'activité.", 'error')
+    #     return redirect(url_for('afficher_activites'))  # Redirige vers la liste des activités en cas d'erreur
 
 
 # la route vers la gestion des activites
