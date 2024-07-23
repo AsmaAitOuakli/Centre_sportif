@@ -34,6 +34,14 @@ class Client(Utilisateur):
         if user_id is None:
             print("Utilisateur non trouvé.")
             return False
+        
+        # Vérification si l'utilisateur est déjà inscrit à l'activité
+        inscriptions = self.get_Inscription_Activite()
+        if inscriptions:
+            for inscription in inscriptions:
+                if inscription[1] == activite_id:
+                    print("Utilisateur déjà inscrit à cette activité.")
+                    return False
 
         user = "ASAA"
         password = "Maghreb1234"
@@ -58,3 +66,28 @@ class Client(Utilisateur):
         else:
             print("Connexion à Snowflake non établie.")
             return False
+        
+    def get_Inscription_Activite(self):
+        user = "ASAA"
+        password = "Maghreb1234"
+        account = "lsyveyx-vd01067"
+        conn = Utilisateur.connect_to_snowflake(user, password, account)
+
+        if conn:
+            try:
+                cursor = conn.cursor()
+                query = "SELECT * FROM Centre_Sportif.Centre.Inscription_Activite WHERE ID_UTILISATEUR = %s"
+                cursor.execute(query, (self.get_user_id(),))
+                result = cursor.fetchall()
+                cursor.close()
+                conn.close()
+                if result:
+                    return result
+                else:
+                    return None
+            except Exception as e:
+                print(f"Erreur lors de la récupération de l'ID utilisateur : {str(e)}")
+                return None
+        else:
+            print("Connexion à Snowflake non établie.")
+            return None

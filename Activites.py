@@ -60,7 +60,7 @@ class Activites():
         password = "Maghreb1234"
         account = "lsyveyx-vd01067"
     
-        conn = cls.connect_to_snowflake(user, password, account)
+        conn = Activites.connect_to_snowflake(user, password, account)
 
         if conn:
             try :
