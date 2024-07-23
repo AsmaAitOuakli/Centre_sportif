@@ -8,7 +8,10 @@
 <body>
     {% include 'navbar.html' %}
     <div class="container mt-4">
-        <h1>Liste des Activités</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Liste des Activités</h1>
+            <a href="{{ url_for('ajouter_activite') }}" class="btn btn-success">Ajouter une activité</a>
+        </div>
         <table class="table">
             <thead>
                 <tr>

@@ -297,21 +297,32 @@ def update_activity():
     else:
         return "Erreur lors de la mise à jour de l'activité."
 
+@app.route('/ajouter_activite', methods=['GET'])
+def afficher_formulaire_ajouter_activite():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('ajouter_activite.html')
+
 @app.route('/ajouter_activite', methods=['POST'])
 def ajouter_activite():
     if 'user' not in session:
         return redirect(url_for('login'))
-    code_activite = request.form['code_activite']
-    nom_activite = request.form['nom_activite']
-    description = request.form['description']
-    prix = request.form['prix']
-    image = request.form['image']
-    
-    activite = Activites(code_activite, nom_activite, description, prix, image)
-    if activite.add_activity():
-        return redirect(url_for('gestion_activites'))
-    else:
-        return "Erreur lors de la mise à jour de l'activité."
+
+    try:
+        code_activite = request.form['code_activite']
+        nom_activite = request.form['nom_activite']
+        description = request.form['description']
+        prix = request.form['prix']
+        image = request.form['image']
+
+        activite = Activites(code_activite, nom_activite, description, prix, image)
+        if activite.add_activity():
+            return redirect(url_for('gestion_activites'))
+        else:
+            return "Erreur lors de la mise à jour de l'activité."
+    except KeyError as e:
+        return f"Missing form key: {str(e)}"
+
     
 if __name__ == '__main__':
     app.run(debug=True)
