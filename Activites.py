@@ -135,3 +135,53 @@ class Activites():
         else:
             print("Connexion à Snowflake non établie.")
             return None
+        
+    def add_activity(self):
+        user = "ASAA"
+        password = "Maghreb1234"
+        account = "lsyveyx-vd01067"
+        
+        conn = Activites.connect_to_snowflake(user, password, account)
+
+        if conn:
+            try:
+                cursor = conn.cursor()
+                query = """
+                    INSERT INTO centre_sportif.centre.activites (Code_Activite, Nom_Activite, description, prix, Image)
+                    VALUES (%s, %s, %s, %s, %s)
+                """
+                cursor.execute(query, (self.Code_Activite, self.Nom_Activite, self.description, self.prix, self.Image,))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                return True
+            except Exception as e:
+                print(f"Erreur lors de l'ajout de l'activité : {str(e)}")
+                return False
+        else:
+            print("Connexion à Snowflake non établie.")
+            return False
+    
+    
+    def delete_activity(self):
+        user = "ASAA"
+        password = "Maghreb1234"
+        account = "lsyveyx-vd01067"
+        
+        conn = Activites.connect_to_snowflake(user, password, account)
+
+        if conn:
+            try:
+                cursor = conn.cursor()
+                query = "DELETE FROM centre_sportif.centre.activites WHERE Code_Activite = %s"
+                cursor.execute(query, (self.Code_Activite,))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                return True
+            except Exception as e:
+                print(f"Erreur lors de la suppression de l'activité : {str(e)}")
+                return False
+        else:
+            print("Connexion à Snowflake non établie.")
+            return False
