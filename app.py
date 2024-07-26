@@ -60,7 +60,8 @@ def check_user():
                     'prenom': user_info['prenom'],
                     'email': user_info['email'],
                     'telephone': user_info['telephone'],
-                    'adresse': user_info['adresse']
+                    'adresse': user_info['adresse'],
+                    'type_utilisateur': user_info['type_utilisateur'] 
                 }
                 return redirect(url_for('afficher_activites'))
             else:

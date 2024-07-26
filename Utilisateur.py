@@ -2,6 +2,9 @@ import snowflake.connector
 from flask import Flask, jsonify, render_template, request
 import bcrypt
 import datetime
+import re
+import random
+import string
 class Utilisateur:
     @classmethod
     def connect_to_snowflake(cls, user, password, account):
@@ -71,7 +74,23 @@ class Utilisateur:
         else:
             print("Connexion à Snowflake non établie.")
             return False
+    
+    def generer_mot_de_passe(self):
+        # Extract year of birth
+        annee_naissance = self.dateNaissance.split('-')[0]
         
+        if len(self.prenom) < 2:
+            raise ValueError("Le prénom doit contenir au moins deux caractères.")
+
+        prenom_part = self.prenom[:2].lower()
+        
+        random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
+        
+        # Combine parts to form the password
+        mot_de_passe = f"{prenom_part}ifitness{annee_naissance}{random_string}"
+        
+        return mot_de_passe
+    
     def s_inscrire(self):
         user = "ASAA"
         password = "Maghreb1234"
@@ -96,8 +115,8 @@ class Utilisateur:
                 self.nom_utilisateur = self.nom[:2].lower() + self.prenom[:2].lower() +str(curantDate)
 
                 # Calcul du mot de passe
-                annee_naissance = self.dateNaissance.split('-')[0]
-                self.mot_de_passe = self.nom[-2:].lower() + "ifitness" + annee_naissance
+                # annee_naissance = self.dateNaissance.split('-')[0]
+                self.mot_de_passe =Utilisateur.generer_mot_de_passe(self)
                 hashed_password = bcrypt.hashpw(self.mot_de_passe.encode('utf-8'), bcrypt.gensalt())
 
                 # Insertion de l'utilisateur dans la base de données
@@ -130,7 +149,7 @@ class Utilisateur:
             try:
                 cursor = conn.cursor()
                 cursor.execute(f"""
-                SELECT nom, prenom, email, telephone, adresse
+                SELECT nom, prenom, email, telephone, adresse, type_utilisateur
                 FROM Centre_Sportif.Centre.Utilisateur
                 WHERE nom_utilisateur = '{self.nom_utilisateur}'
                 """)
@@ -143,12 +162,14 @@ class Utilisateur:
                     self.email = row[2]
                     self.telephone = row[3]
                     self.adresse = row[4]
+                    self.type_utilisateur = row[5]
                     utilisateur_info = {
                         'nom': self.nom,
                         'prenom': self.prenom,
                         'email': self.email,
                         'telephone': self.telephone,
-                        'adresse': self.adresse
+                        'adresse': self.adresse,
+                        'type_utilisateur': self.type_utilisateur
                     }
                     return utilisateur_info
 
