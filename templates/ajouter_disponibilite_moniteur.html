@@ -1,0 +1,43 @@
+<!-- Ajouter Aussi-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter Disponibilité Moniteur</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Ajouter Disponibilité</h1>
+        <form action="{{ url_for('ajouter_disponibilite_moniteur') }}" method="post">
+            <div class="form-group">
+                <label for="jour">Jour</label>
+                <select class="form-control" id="jour" name="jour" required>
+                    <option value="Lundi">Lundi</option>
+                    <option value="Mardi">Mardi</option>
+                    <option value="Mercredi">Mercredi</option>
+                    <option value="Jeudi">Jeudi</option>
+                    <option value="Vendredi">Vendredi</option>
+                    <option value="Samedi">Samedi</option>
+                    <option value="Dimanche">Dimanche</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="code_horaire">Activité et Horaire</label>
+                <select class="form-control" id="code_horaire" name="code_horaire" required>
+                    {% for horaire in horaires %}
+                        <option value="{{ horaire[0] }}">
+                            {{ horaire[4] }} ({{ horaire[2] }} - {{ horaire[3] }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Ajouter Disponibilité</button>
+        </form>
+    </div>
+</body>
+</html>
+
+
+

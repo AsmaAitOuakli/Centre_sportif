@@ -1,4 +1,5 @@
 import snowflake.connector
+from Utilisateur import Utilisateur
 class Activites():
     def __init__(self, Code_Activite, Nom_Activite, description, prix, Image):
         self.Code_Activite = Code_Activite
@@ -185,3 +186,27 @@ class Activites():
         else:
             print("Connexion à Snowflake non établie.")
             return False
+    @staticmethod
+    def get_activities_with_moniteur():
+        try:
+            user = "ASAA"
+            password = "Maghreb1234"
+            account = "lsyveyx-vd01067"
+            conn = Utilisateur.connect_to_snowflake(user, password, account)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT a.Code_Activite, a.Nom_Activite, a.Image, a.prix, a.description, m.nom, m.prenom
+                FROM centre_sportif.centre.activites a
+                LEFT JOIN centre_sportif.centre.disponibilite d ON a.Code_Activite = d.Code_Activite
+                LEFT JOIN centre_sportif.centre.utilisateur m ON d.nom_utilisateur = m.nom_utilisateur
+            """)
+            activites = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            return activites
+        except Exception as e:
+            print(f"Erreur lors de la récupération des activités : {str(e)}")
+            return None
+
+
+        

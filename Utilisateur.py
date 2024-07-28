@@ -12,9 +12,7 @@ class Utilisateur:
             conn = snowflake.connector.connect(
                 user=user,
                 password=password,
-                account=account,
-                database='Centre_Sportif',
-                schema='centre'
+                account=account
             )
             return conn
         except Exception as e:
@@ -149,7 +147,7 @@ class Utilisateur:
             try:
                 cursor = conn.cursor()
                 cursor.execute(f"""
-                SELECT nom, prenom, email, telephone, adresse, type_utilisateur
+                SELECT nom, prenom, email, telephone, adresse, type_utilisateur,mot_de_passe
                 FROM Centre_Sportif.Centre.Utilisateur
                 WHERE nom_utilisateur = '{self.nom_utilisateur}'
                 """)
@@ -163,13 +161,15 @@ class Utilisateur:
                     self.telephone = row[3]
                     self.adresse = row[4]
                     self.type_utilisateur = row[5]
+                    self.mot_de_passe= row[6]
                     utilisateur_info = {
                         'nom': self.nom,
                         'prenom': self.prenom,
                         'email': self.email,
                         'telephone': self.telephone,
                         'adresse': self.adresse,
-                        'type_utilisateur': self.type_utilisateur
+                        'type_utilisateur': self.type_utilisateur,
+                        'mot_de_passe':self.mot_de_passe
                     }
                     return utilisateur_info
 

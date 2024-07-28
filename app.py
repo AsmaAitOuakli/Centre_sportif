@@ -8,6 +8,8 @@ import re
 from Activites import Activites
 from Client import Client
 from Inscription_Activite import Inscription_Activite
+from Moniteur import Moniteur
+
 app = Flask(__name__)
  
 # Generate a random secret key
@@ -61,7 +63,8 @@ def check_user():
                     'email': user_info['email'],
                     'telephone': user_info['telephone'],
                     'adresse': user_info['adresse'],
-                    'type_utilisateur': user_info['type_utilisateur'] 
+                    'type_utilisateur': user_info['type_utilisateur'],
+                    'mot_de_passe': user_info['mot_de_passe'] 
                 }
                 return redirect(url_for('afficher_activites'))
             else:
@@ -214,7 +217,8 @@ def deconnexion():
 @app.route('/activites', methods=['GET'])
 def afficher_activites():
     # Récupère les activités depuis la base de données
-    activites = Activites.get_activities()
+    activites = Activites.get_activities_with_moniteur()
+    # activites = Activites.get_activities_with_moniteur()
     if activites is None:
         flash("Erreur lors de la récupération des activités.", 'error')
         return redirect(url_for('user'))  # Redirige vers la page d'utilisateur en cas d'erreur
@@ -323,7 +327,73 @@ def ajouter_activite():
             return "Erreur lors de la mise à jour de l'activité."
     except KeyError as e:
         return f"Missing form key: {str(e)}"
+################### ajouter ca salma##########################
+@app.route('/ajouter_disponibilite_moniteur', methods=['GET', 'POST'])
+def ajouter_disponibilite_moniteur():
+    if 'user' in session and session['user']['type_utilisateur'] == 'moniteur':
+        if request.method == 'GET':
+            activites = Activites.get_activities()
+            horaires = Moniteur.get_horaires() 
+            return render_template('ajouter_disponibilite_moniteur.html', activites=activites, horaires=horaires)
+        elif request.method == 'POST':
+            user = session['user']
+            moniteur = Moniteur(user['nom_utilisateur'], user['mot_de_passe'], user['nom'], user['prenom'], user['email'])
+            jour = request.form['jour']
+            code_horaire = request.form['code_horaire']
+            if moniteur.ajouter_disponibilite(jour, code_horaire):
+                flash('Disponibilité ajoutée avec succès', 'success')
+            else:
+                flash('Erreur lors de l\'ajout de la disponibilité', 'error')
+            return redirect(url_for('profile'))
+    else:
+        return redirect(url_for('login'))
 
-    
+
+# @app.route('/ajouter_disponibilite_moniteur', methods=['GET', 'POST'])
+# def ajouter_disponibilite_moniteur():
+#     if 'user' in session and session['user']['type_utilisateur'] == 'moniteur':
+#         if request.method == 'GET':
+#             activites = Moniteur.get_activities_with_moniteur()
+#             return render_template('ajouter_disponibilite_moniteur.html', activites=activites)
+#         elif request.method == 'POST':
+#             user = session['user']
+#             moniteur = Moniteur(user['nom_utilisateur'], user['mot_de_passe'], user['nom'], user['prenom'], user['email'])
+#             jour = request.form['jour']
+#             start_hour = request.form['start_hour']
+#             end_hour = request.form['end_hour']
+#             code_activite = request.form['code_activite']
+#             if moniteur.ajouter_disponibilite(jour, start_hour, end_hour, code_activite):
+#                 flash('Disponibilité ajoutée avec succès', 'success')
+#             else:
+#                 flash('Erreur lors de l\'ajout de la disponibilité', 'error')
+#             return redirect(url_for('profile'))
+#     else:
+#         return redirect(url_for('login'))
+################################ ajouter ca ##################################################
+@app.route('/voir_disponibilites_moniteur')
+def voir_disponibilites_moniteur():
+    if 'user' in session and session['user']['type_utilisateur'] == 'moniteur':
+        user = session['user']
+        moniteur = Moniteur(user['nom_utilisateur'], user['mot_de_passe'], user['nom'], user['prenom'], user['email'])
+        disponibilites = moniteur.get_disponibilites()
+        if disponibilites is None:
+            disponibilites = []
+        return render_template('disponibilites_moniteur.html', disponibilites=disponibilites)
+    else:
+        return redirect(url_for('login'))
+
+
+# @app.route('/voir_disponibilites_moniteur')
+# def voir_disponibilites_moniteur():
+#     if 'user' in session and session['user']['type_utilisateur'] == 'moniteur':
+#         user = session['user']
+#         moniteur = Moniteur(user['nom_utilisateur'], user['mot_de_passe'], user['nom'], user['prenom'], user['email'])
+#         disponibilites = moniteur.get_disponibilites()
+#         if disponibilites is None:
+#             disponibilites = []
+#         return render_template('disponibilites_moniteur.html', disponibilites=disponibilites)
+#     else:
+#         return redirect(url_for('login'))
+
 if __name__ == '__main__':
     app.run(debug=True)

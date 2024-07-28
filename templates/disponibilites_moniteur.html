@@ -1,0 +1,36 @@
+<!-- ajouter aussi-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disponibilités Moniteur</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Disponibilités</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Jour</th>
+                    <th>Heure de début</th>
+                    <th>Heure de fin</th>
+                    <th>Activité</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for disponibilite in disponibilites %}
+                    <tr>
+                        <td>{{ disponibilite[0] }}</td>
+                        <td>{{ disponibilite[1] }}</td>
+                        <td>{{ disponibilite[2] }}</td>
+                        <td>{{ disponibilite[3] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
